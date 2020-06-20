@@ -28,6 +28,7 @@ You can freely **get the plugin via the UE4 marketplace** in order to automatica
 ##### 1.2. [Display](#12-Display-1)
 ##### 1.3. [Refresh button](#13-Refresh-button-1)
 ##### 1.4. [Open asset](#14-Open-asset-1)
+##### 1.5. [Exclude button](#15-Exclude-button-1)
 
 #### 2. [Solve circular dependencies](#2-Solve-circular-dependencies-1)
 ##### 2.1. [Use interfaces](#21-Use-interfaces-1)
@@ -63,6 +64,8 @@ If you opened and closed the EWBP, you can re-open it by going to the **Edit Men
 ![Display](Documentation/Images/1_21-Display.png)
 
 Displayed by the plugin :
+- number of excluded assets
+- all excluded assets
 - number of circular dependencies
 - all assets involved in circular dependencies grouped by block.
 
@@ -73,6 +76,8 @@ The current display means this :
 *(A -> B means A depends on B)*
 
 If an asset is displayed in 2 blocks it means that it is involved in 2 different circular dependencies.
+
+All diplayed circular dependencies don't contain the excluded assets.
 
 [Table of contents](#Table-of-contents)
 
@@ -88,7 +93,20 @@ The plugin is using **only hard referencies**.
 
 #### 1.4. Open asset
 
-Press the button of a displayed asset in order to open it. You must **manually search and remove** the references of the asset you no longer have to depend on.
+Press the button of a displayed asset in order to open it. The next asset in the circular dependency is **automatically search**. You just need **to manually make the search result empty** in order to break the circular dependency.
+
+*The search does not work for blueprint function library.*
+
+[![Open asset](Documentation/Gifs/Downsized/1_41-OpenAsset.gif)](Documentation/Gifs/1_41-OpenAsset.gif)
+
+[Table of contents](#Table-of-contents)
+
+#### 1.5. Exclude button
+
+For each asset involved in a circular dependencies, you can press the **Exclude button** in order to exclude the asset from the search of all circular dependencies.  
+For each excluded asset, you can press the **Include button** in order to include the asset in the search of all circular dependencies.
+
+[![Exclude asset](Documentation/Gifs/Downsized/1_51-ExcludeAsset.gif)](Documentation/Gifs/1_51-ExcludeAsset.gif)
 
 [Table of contents](#Table-of-contents)
 
