@@ -36,6 +36,7 @@ public class CircularDependenciesDetector : ModuleRules
 			{
 				"CoreUObject",
 				"Engine",
+				"Kismet",
 				"Slate",
 				"SlateCore",
 				"UnrealEd",
