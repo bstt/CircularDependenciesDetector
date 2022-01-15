@@ -20,5 +20,4 @@ public:
 
     UPROPERTY(BlueprintReadWrite, Category = "Circular Involved Asset Item")
         TArray<FName> DependencyStack;
-
 };

@@ -3,6 +3,7 @@
 #include "CircularDependenciesLib.h"
 #include "Subsystems/AssetEditorSubsystem.h"
 #include "AssetRegistryModule.h"
+#include "BlueprintEditor.h"
 #include "CircularInvolvedAssetItem.h"
 #include "Editor.h"
 #include "EdGraph/EdGraph.h"
@@ -17,6 +18,13 @@ void UCircularDependenciesLib::SearchInBlueprint(UObject* Asset, bool bAllBluepr
 		blueprintEditor->SummonSearchUI(!bAllBlueprints, NewSearchTerms);
 }
 
+UClass* UCircularDependenciesLib::GetClassFromAsset(UObject* Asset)
+{
+	if (UBlueprint* blueprint = Cast<UBlueprint>(Asset))
+		return blueprint->GeneratedClass;
+	return nullptr;
+}
+
 TArray<FString> UCircularDependenciesLib::GetAllFunctions(UObject* Asset)
 {
 	TArray<FString> result;
@@ -28,22 +36,41 @@ TArray<FString> UCircularDependenciesLib::GetAllFunctions(UObject* Asset)
 	return result;
 }
 
-UClass* UCircularDependenciesLib::GetClassFromAsset(UObject* Asset)
+void UCircularDependenciesLib::ExecuteTask(FVoidDelegate toExecute, bool bInBackground, bool bWait)
 {
-	if (UBlueprint* blueprint = Cast<UBlueprint>(Asset))
-		return blueprint->GeneratedClass;
-	return nullptr;
+	volatile bool isDone = false;
+	
+	AsyncTask(bInBackground ? ENamedThreads::AnyBackgroundThreadNormalTask : ENamedThreads::GameThread,
+		[toExecute, &isDone] { toExecute.ExecuteIfBound(); isDone = true; });
+
+	if (bWait)
+		while (!isDone) {} // wait
 }
 
-void UCircularDependenciesLib::AddToDependencyStack(FName CurrentAsset, UPARAM(ref) TArray<FName>& DependencyStack,
-	const TSet<FString>& ExcludedAssetSet, UPARAM(ref) TSet<FNamePair>& BrokenDependecySet, UListView* InvolvedAssetListView)
+void UCircularDependenciesLib::AddToDependencyStack(FName CurrentAsset, UPARAM(ref) TMap<FName, FNameArray>& DependencyListMap,
+	UPARAM(ref) TArray<FName>& DependencyStack, const TSet<FString>& ExcludedAssetSet, UPARAM(ref) TSet<FNamePair>& BrokenDependecySet,
+	UPARAM(ref) TArray<UCircularInvolvedAssetItem*>& circularInvolvedItemArray, UPARAM(ref) FBoolHolder& isStopping, FVoidDelegate toExecuteOnStep)
 {
-	if (ExcludedAssetSet.Contains(CurrentAsset.ToString()))
-		return;
 	DependencyStack.Add(CurrentAsset);
 	static FAssetRegistryModule& assetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
 	TArray<FName> outDependencies;
-	assetRegistryModule.GetRegistry().GetDependencies(CurrentAsset, outDependencies, UE::AssetRegistry::EDependencyCategory::Package, UE::AssetRegistry::FDependencyQuery(UE::AssetRegistry::EDependencyQuery::Hard));
+
+	if (isStopping.value)
+		return;
+	
+	if (const FNameArray* pDependencyList = DependencyListMap.Find(CurrentAsset))
+		outDependencies = pDependencyList->content;
+	else
+	{
+		if (!ExcludedAssetSet.Contains(CurrentAsset.ToString()))
+			assetRegistryModule.GetRegistry().GetDependencies(CurrentAsset, outDependencies,
+				UE::AssetRegistry::EDependencyCategory::Package, UE::AssetRegistry::FDependencyQuery(UE::AssetRegistry::EDependencyQuery::Hard));
+		if (CurrentAsset.ToString().StartsWith("/Game"))
+		{
+			DependencyListMap.Add(CurrentAsset, FNameArray(outDependencies));
+			toExecuteOnStep.Execute();
+		}
+	}
 	for (auto childAsset : outDependencies)
 	{
 		FNamePair currentDependency = FNamePair(CurrentAsset, childAsset);
@@ -51,7 +78,8 @@ void UCircularDependenciesLib::AddToDependencyStack(FName CurrentAsset, UPARAM(r
 			continue;
 		int childAssetIndex = DependencyStack.Find(childAsset);
 		if (childAssetIndex == INDEX_NONE)
-			AddToDependencyStack(childAsset, DependencyStack, ExcludedAssetSet, BrokenDependecySet, InvolvedAssetListView);
+			AddToDependencyStack(childAsset, DependencyListMap, DependencyStack, ExcludedAssetSet, BrokenDependecySet,
+				circularInvolvedItemArray, isStopping, toExecuteOnStep);
 		else
 		{
 			FNamePair oppositeDependency = FNamePair(childAsset, CurrentAsset);
@@ -63,8 +91,9 @@ void UCircularDependenciesLib::AddToDependencyStack(FName CurrentAsset, UPARAM(r
 			UCircularInvolvedAssetItem* circularInvolvedItem = NewObject<UCircularInvolvedAssetItem>();
 			circularInvolvedItem->AssetName = involvedDependencyStack[0];
 			circularInvolvedItem->DependencyStack = involvedDependencyStack;
-			InvolvedAssetListView->AddItem(circularInvolvedItem);
+			circularInvolvedItemArray.Add(circularInvolvedItem);
 		}
 	}
 	DependencyStack.RemoveAt(DependencyStack.Num() - 1);
 }
+
