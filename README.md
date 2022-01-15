@@ -15,7 +15,9 @@ Please report any unexpected behaviours. It will be fixed as soon as possible.
 
 ## Sources
 
-You can get the latest version of the plugin on this [link](https://github.com/bstt/CircularDependenciesDetector/tree/release).
+You can get the lastest source code of the plugin on this [link](https://github.com/bstt/CircularDependenciesDetector/tree/sources).
+
+You can get the latest compiled version of the plugin on this [link](https://github.com/bstt/CircularDependenciesDetector/tree/release).
 
 You can freely **get the plugin via the UE4 marketplace** in order to automatically get the updates.
 
@@ -53,7 +55,8 @@ Circular Dependencies Detector is a tool that **only detect** all circular depen
 
 #### 1.1. Run the Editor Widget
 
-For the first opening you need to :
+<details>
+<summary>Show steps in case of Editor Widget not automatically opened</summary>
 
 - In Content Browser, enable **Show Plugin Content**,
 - Enable **Show Engine Content** (It is recommanded to **_disable Show C++ Classes_**)
@@ -65,6 +68,7 @@ For the first opening you need to :
 ![Show Engine Content](Documentation/Images/1_12-ShowEngineContent.png)
 
 ![Run Editor Utility Widget](Documentation/Images/1_13-RunEditorUtilityWidget.png)
+</details>
 
 If you opened and closed the EWBP, you can re-open it by going to the **Edit Menu -> Editor Widget -> Run EWBP**.
 
