@@ -43,7 +43,7 @@ void UCircularDependenciesLib::AddToDependencyStack(FName CurrentAsset, UPARAM(r
 	DependencyStack.Add(CurrentAsset);
 	static FAssetRegistryModule& assetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
 	TArray<FName> outDependencies;
-	assetRegistryModule.GetRegistry().GetDependencies(CurrentAsset, outDependencies, EAssetRegistryDependencyType::Hard);
+	assetRegistryModule.GetRegistry().GetDependencies(CurrentAsset, outDependencies, UE::AssetRegistry::EDependencyCategory::Package, UE::AssetRegistry::FDependencyQuery(UE::AssetRegistry::EDependencyQuery::Hard));
 	for (auto childAsset : outDependencies)
 	{
 		FNamePair currentDependency = FNamePair(CurrentAsset, childAsset);
