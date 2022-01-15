@@ -55,8 +55,11 @@ void UCircularDependenciesLib::AddToDependencyStack(FName CurrentAsset, UPARAM(r
 	static FAssetRegistryModule& assetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
 	TArray<FName> outDependencies;
 
-	if (isStopping.value)
+	if (isStopping.value || !CurrentAsset.ToString().StartsWith("/Game"))
+	{
+		DependencyStack.RemoveAt(DependencyStack.Num() - 1);
 		return;
+	}
 	
 	if (const FNameArray* pDependencyList = DependencyListMap.Find(CurrentAsset))
 		outDependencies = pDependencyList->content;
@@ -65,14 +68,13 @@ void UCircularDependenciesLib::AddToDependencyStack(FName CurrentAsset, UPARAM(r
 		if (!ExcludedAssetSet.Contains(CurrentAsset.ToString()))
 			assetRegistryModule.GetRegistry().GetDependencies(CurrentAsset, outDependencies,
 				UE::AssetRegistry::EDependencyCategory::Package, UE::AssetRegistry::FDependencyQuery(UE::AssetRegistry::EDependencyQuery::Hard));
-		if (CurrentAsset.ToString().StartsWith("/Game"))
-		{
-			DependencyListMap.Add(CurrentAsset, FNameArray(outDependencies));
-			toExecuteOnStep.Execute();
-		}
+		DependencyListMap.Add(CurrentAsset, FNameArray(outDependencies));
+		toExecuteOnStep.Execute();
 	}
 	for (auto childAsset : outDependencies)
 	{
+		if (!childAsset.ToString().StartsWith("/Game"))
+			continue;
 		FNamePair currentDependency = FNamePair(CurrentAsset, childAsset);
 		if (childAsset.ToString() == CurrentAsset.ToString() || BrokenDependecySet.Contains(currentDependency))
 			continue;
