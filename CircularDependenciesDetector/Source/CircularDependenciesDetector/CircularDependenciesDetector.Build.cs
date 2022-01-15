@@ -40,6 +40,8 @@ public class CircularDependenciesDetector : ModuleRules
 				"Slate",
 				"SlateCore",
 				"UnrealEd",
+				"UMG",
+				"AssetRegistry"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
