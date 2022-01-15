@@ -1,4 +1,4 @@
-// Copyright 2020 bstt, Inc. All Rights Reserved.
+// Copyright 2022 bstt, Inc. All Rights Reserved.
 
 #pragma once
 

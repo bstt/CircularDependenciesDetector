@@ -1,4 +1,4 @@
-// Copyright 2020 bstt, Inc. All Rights Reserved.
+// Copyright 2022 bstt, Inc. All Rights Reserved.
 
 using UnrealBuildTool;
 
@@ -41,7 +41,9 @@ public class CircularDependenciesDetector : ModuleRules
 				"SlateCore",
 				"UnrealEd",
 				"UMG",
-				"AssetRegistry"
+				"AssetRegistry",
+				"Blutility",
+				"UMGEditor"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

@@ -1,4 +1,4 @@
-// Copyright 2020 bstt, Inc. All Rights Reserved.
+// Copyright 2022 bstt, Inc. All Rights Reserved.
 
 #include "CircularDependenciesLib.h"
 #include "Subsystems/AssetEditorSubsystem.h"
@@ -98,4 +98,3 @@ void UCircularDependenciesLib::AddToDependencyStack(FName CurrentAsset, UPARAM(r
 	}
 	DependencyStack.RemoveAt(DependencyStack.Num() - 1);
 }
-

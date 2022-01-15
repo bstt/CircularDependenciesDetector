@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "1.3.2",
+	"VersionName": "1.4.1",
 	"FriendlyName": "Circular Dependencies Detector",
 	"Description": "Plugin for circular dependencies detection.",
 	"Category": "Programming",
@@ -17,7 +17,7 @@
 		{
 			"Name": "CircularDependenciesDetector",
 			"Type": "Editor",
-			"LoadingPhase": "Default",
+			"LoadingPhase": "PostEngineInit",
 			"WhitelistPlatforms": [
 				"Win64",
 				"Win32",
