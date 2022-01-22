@@ -43,7 +43,8 @@ public class CircularDependenciesDetector : ModuleRules
 				"UMG",
 				"AssetRegistry",
 				"Blutility",
-				"UMGEditor"
+				"UMGEditor",
+				"AIModule",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

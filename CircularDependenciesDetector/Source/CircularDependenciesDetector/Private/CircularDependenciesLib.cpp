@@ -1,25 +1,43 @@
 // Copyright 2022 bstt, Inc. All Rights Reserved.
 
 #include "CircularDependenciesLib.h"
-#include "Subsystems/AssetEditorSubsystem.h"
 #include "AssetRegistryModule.h"
+#include "BehaviorTree/BehaviorTree.h"
 #include "BlueprintEditor.h"
 #include "CircularInvolvedAssetItem.h"
 #include "Editor.h"
 #include "EdGraph/EdGraph.h"
 #include "EngineUtils.h"
-#include "FindInBlueprintManager.h"
-#include "FindInBlueprints.h"
+#include "Framework/Notifications/NotificationManager.h"
 #include "ImaginaryBlueprintData.h"
+#include "Subsystems/AssetEditorSubsystem.h"
+#include "Widgets/Notifications/SNotificationList.h"
 
 void UCircularDependenciesLib::SearchInBlueprint(UObject* Asset, bool bAllBlueprints, FString NewSearchTerms)
 {
-	if (FBlueprintEditor* blueprintEditor = StaticCast<FBlueprintEditor*>(GEditor->GetEditorSubsystem<UAssetEditorSubsystem>()->FindEditorForAsset(Asset, false)))
-		blueprintEditor->SummonSearchUI(!bAllBlueprints, NewSearchTerms);
+	auto assetEditorInstance = GEditor->GetEditorSubsystem<UAssetEditorSubsystem>()->FindEditorForAsset(Asset, false);
+	if (Asset->IsA<UBehaviorTree>())
+	{
+		FNotificationInfo notifInfo(NSLOCTEXT("CircularDependenciesDetector", "CircularDependenciesDetector", ""));
+		FString message = FString("Search not available for Behaviour Tree");
+		notifInfo.Text = FText::FromString(message);
+		notifInfo.ExpireDuration = 3.0f;
+		notifInfo.Image = FCoreStyle::Get().GetBrush(TEXT("MessageLog.Warning"));
+		FSlateNotificationManager::Get().AddNotification(notifInfo);
+		UE_LOG(LogTemp, Warning, TEXT("%s, contact me if you know how to implement it"), *message);
+	}
+	else //if (Asset->IsA<UBlueprint>())
+	{
+		// UE_LOG(LogTemp, Warning, TEXT("Class name : %s"), *Asset->GetClass()->GetDisplayNameText().ToString());
+		if (IBlueprintEditor* blueprintEditor = StaticCast<IBlueprintEditor*>(assetEditorInstance))
+			blueprintEditor->SummonSearchUI(!bAllBlueprints, NewSearchTerms);
+	}
 }
 
 UClass* UCircularDependenciesLib::GetClassFromAsset(UObject* Asset)
 {
+	if (!IsValid(Asset)) return nullptr;
+
 	if (UBlueprint* blueprint = Cast<UBlueprint>(Asset))
 		return blueprint->GeneratedClass;
 	return nullptr;
@@ -28,6 +46,8 @@ UClass* UCircularDependenciesLib::GetClassFromAsset(UObject* Asset)
 TArray<FString> UCircularDependenciesLib::GetAllFunctions(UObject* Asset)
 {
 	TArray<FString> result;
+
+	if (!IsValid(Asset)) return result;
 	
 	if (UBlueprint* blueprint = Cast<UBlueprint>(Asset))
 		for (auto p : blueprint->FunctionGraphs)
@@ -36,10 +56,16 @@ TArray<FString> UCircularDependenciesLib::GetAllFunctions(UObject* Asset)
 	return result;
 }
 
-void UCircularDependenciesLib::ExecuteTask(FVoidDelegate toExecute, bool bInBackground, bool bWait)
+bool UCircularDependenciesLib::IsInGameOrSlateThread()
+{
+	return IsInGameThread() || IsInSlateThread();
+}
+
+void UCircularDependenciesLib::ExecuteTask(const FVoidDelegate& toExecute, bool bInBackground, bool bWait)
 {
 	volatile bool isDone = false;
 	
+	// toExecute must be passed as copy because...
 	AsyncTask(bInBackground ? ENamedThreads::AnyBackgroundThreadNormalTask : ENamedThreads::GameThread,
 		[toExecute, &isDone] { toExecute.ExecuteIfBound(); isDone = true; });
 
@@ -49,10 +75,11 @@ void UCircularDependenciesLib::ExecuteTask(FVoidDelegate toExecute, bool bInBack
 
 void UCircularDependenciesLib::AddToDependencyStack(FName CurrentAsset, UPARAM(ref) TMap<FName, FNameArray>& DependencyListMap,
 	UPARAM(ref) TArray<FName>& DependencyStack, const TSet<FString>& ExcludedAssetSet, UPARAM(ref) TSet<FNamePair>& BrokenDependecySet,
-	UPARAM(ref) TArray<UCircularInvolvedAssetItem*>& circularInvolvedItemArray, UPARAM(ref) FBoolHolder& isStopping, FVoidDelegate toExecuteOnStep)
+	UPARAM(ref) TArray<UCircularInvolvedAssetItem*>& circularInvolvedItemArray, UPARAM(ref) FBoolHolder& isStopping, const FVoidDelegate& toExecuteOnStep)
 {
+	if (!FModuleManager::Get().IsModuleLoaded("AssetRegistry")) return;
 	DependencyStack.Add(CurrentAsset);
-	static FAssetRegistryModule& assetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
+	static FAssetRegistryModule& assetRegistryModule = FModuleManager::GetModuleChecked<FAssetRegistryModule>("AssetRegistry");
 	TArray<FName> outDependencies;
 
 	if (isStopping.value || !CurrentAsset.ToString().StartsWith("/Game"))
@@ -69,7 +96,7 @@ void UCircularDependenciesLib::AddToDependencyStack(FName CurrentAsset, UPARAM(r
 			assetRegistryModule.GetRegistry().GetDependencies(CurrentAsset, outDependencies,
 				UE::AssetRegistry::EDependencyCategory::Package, UE::AssetRegistry::FDependencyQuery(UE::AssetRegistry::EDependencyQuery::Hard));
 		DependencyListMap.Add(CurrentAsset, FNameArray(outDependencies));
-		toExecuteOnStep.Execute();
+		toExecuteOnStep.ExecuteIfBound();
 	}
 	for (auto childAsset : outDependencies)
 	{
