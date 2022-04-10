@@ -27,7 +27,7 @@ void FCircularDependenciesDetectorModule::SpawnCDD()
 		UEditorUtilitySubsystem* EditorUtilitySubsystem = GEditor->GetEditorSubsystem<UEditorUtilitySubsystem>();
 
 		if (!IsValid(EditorUtilitySubsystem)) return;
-		const FStringAssetReference ewbpPath("/CircularDependenciesDetector/CircularDep/CircularDependencies_EWBP.CircularDependencies_EWBP");
+		const FSoftObjectPath ewbpPath("/CircularDependenciesDetector/CircularDep/CircularDependencies_EWBP.CircularDependencies_EWBP");
 		UObject* Blueprint = ewbpPath.TryLoad();
 
 		if (!IsValid(Blueprint)) return;
