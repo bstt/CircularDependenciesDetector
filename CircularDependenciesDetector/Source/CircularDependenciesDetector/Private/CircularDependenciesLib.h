@@ -42,8 +42,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Circular Dependencies Lib")
 		static void ExecuteTask(const FVoidDelegate& toExecute, bool bInBackground, bool bWait);
 
+	UFUNCTION(BlueprintPure, Category = "Circular Dependencies Lib")
+		static bool RegexFind(const FString& pattern, const FString& input);
+
 	UFUNCTION(BlueprintCallable, Category = "Circular Dependencies Lib")
 		static void AddToDependencyStack(FName CurrentAsset, UPARAM(ref) TMap<FName, FNameArray>& DependencyListMap,
 			UPARAM(ref) TArray<FName>& DependencyStack, const TSet<FString>& ExcludedAssetSet, UPARAM(ref) TSet<FNamePair>& BrokenDependecySet,
-			UPARAM(ref) TArray<UCircularInvolvedAssetItem*>& circularInvolvedItemArray, UPARAM(ref) FBoolHolder& isStopping, const FVoidDelegate& toExecuteOnStep);
+			UPARAM(ref) TArray<UCircularInvolvedAssetItem*>& circularInvolvedItemArray, UPARAM(ref) FBoolHolder& isStopping);
 };

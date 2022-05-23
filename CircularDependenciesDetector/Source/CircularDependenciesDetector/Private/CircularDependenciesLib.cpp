@@ -10,6 +10,7 @@
 #include "EngineUtils.h"
 #include "Framework/Notifications/NotificationManager.h"
 #include "ImaginaryBlueprintData.h"
+#include "Internationalization/Regex.h"
 #include "Subsystems/AssetEditorSubsystem.h"
 #include "Widgets/Notifications/SNotificationList.h"
 
@@ -73,16 +74,23 @@ void UCircularDependenciesLib::ExecuteTask(const FVoidDelegate& toExecute, bool 
 		while (!isDone) {} // wait
 }
 
+bool UCircularDependenciesLib::RegexFind(const FString& pattern, const FString& input)
+{
+	return FRegexMatcher(FRegexPattern(pattern), input).FindNext();
+}
+
 void UCircularDependenciesLib::AddToDependencyStack(FName CurrentAsset, UPARAM(ref) TMap<FName, FNameArray>& DependencyListMap,
 	UPARAM(ref) TArray<FName>& DependencyStack, const TSet<FString>& ExcludedAssetSet, UPARAM(ref) TSet<FNamePair>& BrokenDependecySet,
-	UPARAM(ref) TArray<UCircularInvolvedAssetItem*>& circularInvolvedItemArray, UPARAM(ref) FBoolHolder& isStopping, const FVoidDelegate& toExecuteOnStep)
+	UPARAM(ref) TArray<UCircularInvolvedAssetItem*>& circularInvolvedItemArray, UPARAM(ref) FBoolHolder& isStopping)
 {
 	if (!FModuleManager::Get().IsModuleLoaded("AssetRegistry")) return;
 	DependencyStack.Add(CurrentAsset);
 	static FAssetRegistryModule& assetRegistryModule = FModuleManager::GetModuleChecked<FAssetRegistryModule>("AssetRegistry");
 	TArray<FName> outDependencies;
 
-	if (isStopping.value || !CurrentAsset.ToString().StartsWith("/Game"))
+	static const FRegexPattern externalPattern(TEXT("/__External[^/]*__/"));
+
+	if (isStopping.value || !CurrentAsset.ToString().StartsWith("/Game") || FRegexMatcher(externalPattern, CurrentAsset.ToString()).FindNext())
 	{
 		DependencyStack.RemoveAt(DependencyStack.Num() - 1);
 		return;
@@ -96,11 +104,10 @@ void UCircularDependenciesLib::AddToDependencyStack(FName CurrentAsset, UPARAM(r
 			assetRegistryModule.GetRegistry().GetDependencies(CurrentAsset, outDependencies,
 				UE::AssetRegistry::EDependencyCategory::Package, UE::AssetRegistry::FDependencyQuery(UE::AssetRegistry::EDependencyQuery::Hard));
 		DependencyListMap.Add(CurrentAsset, FNameArray(outDependencies));
-		toExecuteOnStep.ExecuteIfBound();
 	}
 	for (auto childAsset : outDependencies)
 	{
-		if (!childAsset.ToString().StartsWith("/Game"))
+		if (!childAsset.ToString().StartsWith("/Game") || FRegexMatcher(externalPattern, childAsset.ToString()).FindNext())
 			continue;
 		FNamePair currentDependency = FNamePair(CurrentAsset, childAsset);
 		if (childAsset.ToString() == CurrentAsset.ToString() || BrokenDependecySet.Contains(currentDependency))
@@ -108,7 +115,7 @@ void UCircularDependenciesLib::AddToDependencyStack(FName CurrentAsset, UPARAM(r
 		int childAssetIndex = DependencyStack.Find(childAsset);
 		if (childAssetIndex == INDEX_NONE)
 			AddToDependencyStack(childAsset, DependencyListMap, DependencyStack, ExcludedAssetSet, BrokenDependecySet,
-				circularInvolvedItemArray, isStopping, toExecuteOnStep);
+				circularInvolvedItemArray, isStopping);
 		else
 		{
 			FNamePair oppositeDependency = FNamePair(childAsset, CurrentAsset);
