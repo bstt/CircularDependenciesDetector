@@ -26,7 +26,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Circular Dependencies Lib", meta = (Keywords = "find editor"))
 		static void SearchInBlueprint(UObject* Asset, bool bAllBlueprints, FString NewSearchTerms);
 
-	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Circular Dependencies Lib")
+	UFUNCTION(BlueprintPure, Category = "Circular Dependencies Lib")
 		static UClass* GetClassFromAsset(UObject* Asset);
 
 	UFUNCTION(BlueprintCallable, Category = "Circular Dependencies Lib", meta = (Keywords = "method class"))
@@ -34,7 +34,7 @@ public:
 
 	// Some actions like accessing Slate must be done in a GameThread or SlateThread
 	// Use this function to check this
-	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Circular Dependencies Lib")
+	UFUNCTION(BlueprintPure, Category = "Circular Dependencies Lib")
 		static bool IsInGameOrSlateThread();
 
 	// Some actions like spawining object cannot be done in background
@@ -49,4 +49,10 @@ public:
 		static void AddToDependencyStack(FName CurrentAsset, UPARAM(ref) TMap<FName, FNameArray>& DependencyListMap,
 			UPARAM(ref) TArray<FName>& DependencyStack, const TSet<FString>& ExcludedAssetSet, UPARAM(ref) TSet<FNamePair>& BrokenDependecySet,
 			UPARAM(ref) TArray<UCircularInvolvedAssetItem*>& circularInvolvedItemArray, UPARAM(ref) FBoolHolder& isStopping);
+
+	UFUNCTION(BlueprintPure, Category = "Circular Dependencies Lib")
+		static int getMaxDetectionCount();
+
+	UFUNCTION(BlueprintPure, Category = "Circular Dependencies Lib")
+		static float getAutomaticRefreshDelay();
 };

@@ -5,6 +5,7 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "BlueprintEditor.h"
 #include "CircularInvolvedAssetItem.h"
+#include "../Config/CDD_EditorConfig.h"
 #include "Editor.h"
 #include "EdGraph/EdGraph.h"
 #include "EngineUtils.h"
@@ -131,4 +132,14 @@ void UCircularDependenciesLib::AddToDependencyStack(FName CurrentAsset, UPARAM(r
 		}
 	}
 	DependencyStack.RemoveAt(DependencyStack.Num() - 1);
+}
+
+int UCircularDependenciesLib::getMaxDetectionCount()
+{
+	return UCDD_EditorConfig::Get()->maxDetectionCount;
+}
+
+float UCircularDependenciesLib::getAutomaticRefreshDelay()
+{
+	return UCDD_EditorConfig::Get()->automaticRefreshDelay;
 }

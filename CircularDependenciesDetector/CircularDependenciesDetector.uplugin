@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "1.4.4",
+	"VersionName": "1.5.1",
 	"FriendlyName": "Circular Dependencies Detector",
 	"Description": "Plugin for circular dependencies detection.",
 	"Category": "Programming",

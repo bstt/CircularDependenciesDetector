@@ -1,6 +1,7 @@
 // Copyright 2022 bstt, Inc. All Rights Reserved.
 
-#include "CircularDependenciesDetector.h"
+#include "CircularDependenciesDetectorModule.h"
+#include "Config/CDD_Settings.h"
 #include "AssetRegistryModule.h"
 #include "EditorUtilitySubsystem.h"
 #include "EditorUtilityWidgetBlueprint.h"
@@ -11,12 +12,13 @@
 
 void FCircularDependenciesDetectorModule::StartupModule()
 {
+	CDD_Settings::RegisterSettings();
 	SpawnCDD();
 }
 
 void FCircularDependenciesDetectorModule::ShutdownModule()
 {
-
+	CDD_Settings::UnregisterSettings();
 }
 
 void FCircularDependenciesDetectorModule::SpawnCDD()
