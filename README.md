@@ -17,8 +17,6 @@ Please report any unexpected behaviours. It will be fixed as soon as possible.
 
 You can get the lastest source code of the plugin on this [link](https://github.com/bstt/CircularDependenciesDetector/tree/sources).
 
-You can get the latest compiled version of the plugin on this [link](https://github.com/bstt/CircularDependenciesDetector/tree/release).
-
 You can freely **get the plugin via the Unreal Engine marketplace** in order to automatically get the updates.
 
 ## Documentation:
@@ -41,9 +39,11 @@ You can freely **get the plugin via the Unreal Engine marketplace** in order to 
 
 #### 2. [Configuration](#2-Configuration-1)
 
-##### 2.1. [Max Detection Count](#21-Max-Detection-Count-1)
+##### 2.1. [Show On Startup](#21-Show-On-Startup-1)
 
-##### 2.2. [Automatic Refresh Delay](#22-Automatic-Refresh-Delay-1)
+##### 2.2. [Max Detection Count](#22-Max-Detection-Count-1)
+
+##### 2.3. [Automatic Refresh Delay](#23-Automatic-Refresh-Delay-1)
 
 #### 3. [Solve circular dependencies](#3-Solve-circular-dependencies-1)
 
@@ -133,7 +133,7 @@ Press the button of a displayed asset in order to open it. The next asset in the
 
 **A specific search is done for Blueprint Function Library.**
 
-![Blueprint Function Library Search](Documentation/Images/1_52-BlueprintFunctionLibrarySearch.png)
+![Blueprint Function Library Search](Documentation/Images/1_42-BlueprintFunctionLibrarySearch.png)
 
 [Table of contents](#Table-of-contents)
 
@@ -148,15 +148,19 @@ For each excluded asset, you can press the **Include button** in order to includ
 
 ### 2. Configuration
 
-You can change CDD option in ***Editor Preferences/Plugins/Auto Node Arranger.***
+You can change CDD option in ***Editor Preferences/Plugins/Circular Dependencies Detector.***
 
 ![Configuration](Documentation/Images/2-Configuration.png)
 
-#### 2.1. Max Detection Count
+#### 2.1. Show On Startup
+
+Enable this option to spawn the CDD Editor Widget on startup.
+
+#### 2.2. Max Detection Count
 
 This is the number of circular dependencies detected from which detection is interrupted.
 
-#### 2.2. Automatic Refresh Delay
+#### 2.3. Automatic Refresh Delay
 
 This is the delay in seconds before an automatic refresh, put a negative value to disable the automatic refresh.
 
