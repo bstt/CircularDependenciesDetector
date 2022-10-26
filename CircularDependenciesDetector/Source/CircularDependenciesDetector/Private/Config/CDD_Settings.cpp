@@ -39,6 +39,11 @@ void CDD_Settings::UnregisterSettings()
 		SettingsModule->UnregisterSettings("Editor", "Plugins", "Circular Dependencies Detector");
 }
 
+bool CDD_Settings::ShowOnStartup()
+{
+	return UCDD_EditorConfig::Get()->bShowOnStartup;
+}
+
 void CDD_Settings::resetConfigToDefaultValues(UObject* SettingsObject)
 {
 	FString ConfigName = SettingsObject->GetClass()->GetConfigName();

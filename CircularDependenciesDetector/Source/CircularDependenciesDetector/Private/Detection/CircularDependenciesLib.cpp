@@ -80,7 +80,7 @@ bool UCircularDependenciesLib::RegexFind(const FString& pattern, const FString& 
 	return FRegexMatcher(FRegexPattern(pattern), input).FindNext();
 }
 
-void UCircularDependenciesLib::AddToDependencyStack(FName CurrentAsset, UPARAM(ref) TMap<FName, FNameArray>& DependencyListMap,
+void UCircularDependenciesLib::AddToDependencyStack(const FName& CurrentAsset, UPARAM(ref) TMap<FName, FNameArray>& DependencyListMap,
 	UPARAM(ref) TArray<FName>& DependencyStack, const TSet<FString>& ExcludedAssetSet, UPARAM(ref) TSet<FNamePair>& BrokenDependecySet,
 	UPARAM(ref) TArray<UCircularInvolvedAssetItem*>& circularInvolvedItemArray, UPARAM(ref) FBoolHolder& isStopping)
 {
@@ -106,7 +106,7 @@ void UCircularDependenciesLib::AddToDependencyStack(FName CurrentAsset, UPARAM(r
 				UE::AssetRegistry::EDependencyCategory::Package, UE::AssetRegistry::FDependencyQuery(UE::AssetRegistry::EDependencyQuery::Hard));
 		DependencyListMap.Add(CurrentAsset, FNameArray(outDependencies));
 	}
-	for (auto childAsset : outDependencies)
+	for (const auto& childAsset : outDependencies)
 	{
 		if (!childAsset.ToString().StartsWith("/Game") || FRegexMatcher(externalPattern, childAsset.ToString()).FindNext())
 			continue;

@@ -12,6 +12,8 @@ public:
 	static void RegisterSettings();
 	static void UnregisterSettings();
 
+	static bool ShowOnStartup();
+
 private:
 	static void resetConfigToDefaultValues(UObject* SettingsObject);
 };

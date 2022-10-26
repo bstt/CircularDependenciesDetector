@@ -18,6 +18,10 @@ public:
 
 	FORCEINLINE static UCDD_EditorConfig* Get() { return GetMutableDefault<UCDD_EditorConfig>(); }
 
+	// show Circular Dependencies Detector Editor Widget on startup
+	UPROPERTY(EditAnywhere, config, Category = "Circular Dependencies Detector")
+		bool bShowOnStartup = true;
+
 	// number of circular dependencies detected from which detection is interrupted
 	UPROPERTY(EditAnywhere, config, Category = "Circular Dependencies Detector")
 		uint32 maxDetectionCount = 100;
