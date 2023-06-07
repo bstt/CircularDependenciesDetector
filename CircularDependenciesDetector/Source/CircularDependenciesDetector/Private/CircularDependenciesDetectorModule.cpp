@@ -2,7 +2,7 @@
 
 #include "CircularDependenciesDetectorModule.h"
 #include "Config/CDD_Settings.h"
-#include "AssetRegistryModule.h"
+#include "AssetRegistry/AssetRegistryModule.h"
 #include "EditorUtilitySubsystem.h"
 #include "EditorUtilityWidgetBlueprint.h"
 #include "EditorUtilityWidget.h"

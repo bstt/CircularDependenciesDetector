@@ -53,5 +53,5 @@ void CDD_Settings::resetConfigToDefaultValues(UObject* SettingsObject)
 
 	FConfigCacheIni::LoadGlobalIniFile(ConfigName, *FPaths::GetBaseFilename(ConfigName), nullptr, true);
 
-	SettingsObject->ReloadConfig(nullptr, nullptr, UE4::LCPF_PropagateToInstances | UE4::LCPF_PropagateToChildDefaultObjects);
+	SettingsObject->ReloadConfig(nullptr, nullptr, UE::LCPF_PropagateToInstances | UE::LCPF_PropagateToChildDefaultObjects);
 }
