@@ -2,7 +2,7 @@
 
 This branch contains only the source code of the latest version of the plugin.
 
-Compatible version of Unreal Engine : **5.0**
+Compatible version of Unreal Engine : **5.1**
 
 In order to compile the plugin you need to :
 - Create an Unreal Engine **C++ project**.
