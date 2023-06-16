@@ -13,7 +13,7 @@
 void FCircularDependenciesDetectorModule::StartupModule()
 {
 	CDD_Settings::RegisterSettings();
-	if (CDD_Settings::ShowOnStartup())
+	if (CDD_Settings::bShowOnStartup())
 		SpawnCDD();
 }
 

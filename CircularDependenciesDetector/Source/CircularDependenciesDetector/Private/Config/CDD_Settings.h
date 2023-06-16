@@ -12,7 +12,7 @@ public:
 	static void RegisterSettings();
 	static void UnregisterSettings();
 
-	static bool ShowOnStartup();
+	static bool bShowOnStartup();
 
 private:
 	static void resetConfigToDefaultValues(UObject* SettingsObject);

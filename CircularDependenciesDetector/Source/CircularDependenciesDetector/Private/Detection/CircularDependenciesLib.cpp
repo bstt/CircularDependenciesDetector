@@ -14,6 +14,8 @@
 #include "Internationalization/Regex.h"
 #include "Subsystems/AssetEditorSubsystem.h"
 #include "Widgets/Notifications/SNotificationList.h"
+#include <Config/CDD_ProjectConfig.h>
+#include "Interfaces/IPluginManager.h"
 
 void UCircularDependenciesLib::SearchInBlueprint(UObject* Asset, bool bAllBlueprints, FString NewSearchTerms)
 {
@@ -80,8 +82,8 @@ bool UCircularDependenciesLib::RegexFind(const FString& pattern, const FString& 
 	return FRegexMatcher(FRegexPattern(pattern), input).FindNext();
 }
 
-void UCircularDependenciesLib::AddToDependencyStack(const FName& CurrentAsset, UPARAM(ref) TMap<FName, FNameArray>& DependencyListMap,
-	UPARAM(ref) TArray<FName>& DependencyStack, const TSet<FString>& ExcludedAssetSet, UPARAM(ref) TSet<FNamePair>& BrokenDependecySet,
+void UCircularDependenciesLib::AddToDependencyStack(const TArray<FString>& assetPackageArray, const FName& CurrentAsset, UPARAM(ref) TMap<FName, FNameArray>& DependencyListMap,
+	UPARAM(ref) TArray<FName>& DependencyStack, UPARAM(ref) TSet<FNamePair>& BrokenDependecySet,
 	UPARAM(ref) TArray<UCircularInvolvedAssetItem*>& circularInvolvedItemArray, UPARAM(ref) FBoolHolder& isStopping)
 {
 	if (!FModuleManager::Get().IsModuleLoaded("AssetRegistry")) return;
@@ -91,7 +93,9 @@ void UCircularDependenciesLib::AddToDependencyStack(const FName& CurrentAsset, U
 
 	static const FRegexPattern externalPattern(TEXT("/__External[^/]*__/"));
 
-	if (isStopping.value || !CurrentAsset.ToString().StartsWith("/Game") || FRegexMatcher(externalPattern, CurrentAsset.ToString()).FindNext())
+	if (isStopping.value
+		|| !assetPackageArray.FindByPredicate([&CurrentAsset](FString assetPackage) { return CurrentAsset.ToString().StartsWith(assetPackage); })
+		|| FRegexMatcher(externalPattern, CurrentAsset.ToString()).FindNext())
 	{
 		DependencyStack.RemoveAt(DependencyStack.Num() - 1);
 		return;
@@ -101,21 +105,22 @@ void UCircularDependenciesLib::AddToDependencyStack(const FName& CurrentAsset, U
 		outDependencies = pDependencyList->content;
 	else
 	{
-		if (!ExcludedAssetSet.Contains(CurrentAsset.ToString()))
+		if (!getExcludedAssetList().Contains(CurrentAsset.ToString()))
 			assetRegistryModule.GetRegistry().GetDependencies(CurrentAsset, outDependencies,
 				UE::AssetRegistry::EDependencyCategory::Package, UE::AssetRegistry::FDependencyQuery(UE::AssetRegistry::EDependencyQuery::Hard));
 		DependencyListMap.Add(CurrentAsset, FNameArray(outDependencies));
 	}
 	for (const auto& childAsset : outDependencies)
 	{
-		if (!childAsset.ToString().StartsWith("/Game") || FRegexMatcher(externalPattern, childAsset.ToString()).FindNext())
+		if (!assetPackageArray.FindByPredicate([&childAsset](FString assetPackage) { return childAsset.ToString().StartsWith(assetPackage); })
+			|| FRegexMatcher(externalPattern, childAsset.ToString()).FindNext())
 			continue;
 		FNamePair currentDependency = FNamePair(CurrentAsset, childAsset);
 		if (childAsset.ToString() == CurrentAsset.ToString() || BrokenDependecySet.Contains(currentDependency))
 			continue;
 		int childAssetIndex = DependencyStack.Find(childAsset);
 		if (childAssetIndex == INDEX_NONE)
-			AddToDependencyStack(childAsset, DependencyListMap, DependencyStack, ExcludedAssetSet, BrokenDependecySet,
+			AddToDependencyStack(assetPackageArray, childAsset, DependencyListMap, DependencyStack, BrokenDependecySet,
 				circularInvolvedItemArray, isStopping);
 		else
 		{
@@ -142,4 +147,52 @@ int UCircularDependenciesLib::getMaxDetectionCount()
 float UCircularDependenciesLib::getAutomaticRefreshDelay()
 {
 	return UCDD_EditorConfig::Get()->automaticRefreshDelay;
+}
+
+TArray<FPlugin> UCircularDependenciesLib::GetEnabledPlugins()
+{
+	TArray<FPlugin> result;
+	for (const auto& plugin : IPluginManager::Get().GetEnabledPlugins())
+		result.Add(FPlugin(plugin->GetName(), plugin->GetBaseDir()));
+	return result;
+}
+
+const TArray<FString>& UCircularDependenciesLib::getPluginList()
+{
+	return UCDD_ProjectConfig::Get()->pluginList;
+}
+
+void UCircularDependenciesLib::addPlugin(const FString& plugin)
+{
+	UCDD_ProjectConfig::Get()->pluginList.AddUnique(plugin);
+	UCDD_ProjectConfig::Get()->SaveConfig();
+}
+
+void UCircularDependenciesLib::removePlugin(const FString& plugin)
+{
+	UCDD_ProjectConfig::Get()->pluginList.Remove(plugin);
+	UCDD_ProjectConfig::Get()->SaveConfig();
+}
+
+const TArray<FString>& UCircularDependenciesLib::getExcludedAssetList()
+{
+	return UCDD_ProjectConfig::Get()->excludedAssetList;
+}
+
+bool UCircularDependenciesLib::addExcludedAsset(const FString& excludedAsset)
+{
+	bool result = !UCDD_ProjectConfig::Get()->excludedAssetList.Contains(excludedAsset); // true if not already contained
+	if (result)
+	{
+		UCDD_ProjectConfig::Get()->excludedAssetList.Add(excludedAsset);
+		UCDD_ProjectConfig::Get()->SaveConfig();
+	}
+	return result;
+}
+
+bool UCircularDependenciesLib::removeExcludedAsset(const FString& excludedAsset)
+{
+	bool result = UCDD_ProjectConfig::Get()->excludedAssetList.Remove(excludedAsset) > 0;
+	UCDD_ProjectConfig::Get()->SaveConfig();
+	return result;
 }

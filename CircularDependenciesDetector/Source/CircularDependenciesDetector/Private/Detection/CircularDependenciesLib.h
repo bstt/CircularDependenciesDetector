@@ -9,6 +9,7 @@
 #include "Components/ListView.h"
 #include "NameArray.h"
 #include "NamePair.h"
+#include "Plugin.h"
 #include "CircularDependenciesLib.generated.h"
 
 /**
@@ -46,8 +47,8 @@ public:
 		static bool RegexFind(const FString& pattern, const FString& input);
 
 	UFUNCTION(BlueprintCallable, Category = "Circular Dependencies Lib")
-		static void AddToDependencyStack(const FName& CurrentAsset, UPARAM(ref) TMap<FName, FNameArray>& DependencyListMap,
-			UPARAM(ref) TArray<FName>& DependencyStack, const TSet<FString>& ExcludedAssetSet, UPARAM(ref) TSet<FNamePair>& BrokenDependecySet,
+		static void AddToDependencyStack(const TArray<FString>& assetPackageArray, const FName& CurrentAsset, UPARAM(ref) TMap<FName, FNameArray>& DependencyListMap,
+			UPARAM(ref) TArray<FName>& DependencyStack, UPARAM(ref) TSet<FNamePair>& BrokenDependecySet,
 			UPARAM(ref) TArray<UCircularInvolvedAssetItem*>& circularInvolvedItemArray, UPARAM(ref) FBoolHolder& isStopping);
 
 	UFUNCTION(BlueprintPure, Category = "Circular Dependencies Lib")
@@ -55,4 +56,27 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "Circular Dependencies Lib")
 		static float getAutomaticRefreshDelay();
+
+	UFUNCTION(BlueprintCallable, Category = "Circular Dependencies Lib")
+		static TArray<FPlugin> GetEnabledPlugins();
+
+	UFUNCTION(BlueprintPure, Category = "Circular Dependencies Lib/Project setting")
+		static const TArray<FString>& getPluginList();
+
+	UFUNCTION(BlueprintCallable, Category = "Circular Dependencies Lib/Project setting")
+		static void addPlugin(const FString& plugin);
+
+	UFUNCTION(BlueprintCallable, Category = "Circular Dependencies Lib/Project setting")
+		static void removePlugin(const FString& plugin);
+
+	UFUNCTION(BlueprintPure, Category = "Circular Dependencies Lib/Project setting")
+		static const TArray<FString>& getExcludedAssetList();
+
+	// returns true if asset has been added
+	UFUNCTION(BlueprintCallable, Category = "Circular Dependencies Lib/Project setting")
+		static bool addExcludedAsset(const FString& excludedAsset);
+
+	// returns true if asset has been removed
+	UFUNCTION(BlueprintCallable, Category = "Circular Dependencies Lib/Project setting")
+		static bool removeExcludedAsset(const FString& excludedAsset);
 };
