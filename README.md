@@ -37,6 +37,8 @@ You can freely **get the plugin via the Unreal Engine marketplace** in order to 
 
 ##### 1.6. [Exclude button](#16-Exclude-button-1)
 
+##### 1.7. [Show plugins](#17-Show-plugins-1)
+
 #### 2. [Configuration](#2-Configuration-1)
 
 ##### 2.1. [Show On Startup](#21-Show-On-Startup-1)
@@ -146,6 +148,14 @@ For each excluded asset, you can press the **Include button** in order to includ
 
 [Table of contents](#Table-of-contents)
 
+#### 1.7. Show plugins
+
+By default, the plugin is only searching circular dependencies in the project. You can click on the **Show plugins** button and select the plugins you want to include in the search.
+
+![Show plugins](Documentation/Images/1_71-ShowPlugins.png)
+
+[Table of contents](#Table-of-contents)
+
 ### 2. Configuration
 
 You can change CDD option in ***Editor Preferences/Plugins/Circular Dependencies Detector.***
@@ -187,7 +197,7 @@ _(A -> B means A depends on B)_
 
 #### 3.1. Use interfaces
 
-[Dependency injection pattern](https://en.wikipedia.org/wiki/Dependency_injection) is a simple way to resolve dependencies problem.
+[Dependency inversion principle](https://en.wikipedia.org/wiki/Dependency_inversion_principle#Implementations) is a simple way to resolve dependencies problem.
 
 **Solution :**  
 Move the functions funcB1 and funcB2 in an interface B_Interface and call the functions from the interface instead of the class B.
