@@ -87,6 +87,7 @@ void UCircularDependenciesLib::AddToDependencyStack(const TArray<FString>& asset
 	UPARAM(ref) TArray<UCircularInvolvedAssetItem*>& circularInvolvedItemArray, UPARAM(ref) FBoolHolder& isStopping)
 {
 	if (!FModuleManager::Get().IsModuleLoaded("AssetRegistry")) return;
+	if (DependencyStack.Num() >= (int32)UCDD_EditorConfig::Get()->maxDependencyDepth) return;
 	DependencyStack.Add(CurrentAsset);
 	static FAssetRegistryModule& assetRegistryModule = FModuleManager::GetModuleChecked<FAssetRegistryModule>("AssetRegistry");
 	TArray<FName> outDependencies;

@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "1.6.1",
+	"VersionName": "1.6.2",
 	"FriendlyName": "Circular Dependencies Detector",
 	"Description": "Plugin for circular dependencies detection.",
 	"Category": "Programming",
@@ -24,5 +24,7 @@
 				"Linux"
 			]
 		}
-	]
+	],
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false
 }

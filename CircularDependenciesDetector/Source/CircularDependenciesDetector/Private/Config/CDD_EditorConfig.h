@@ -26,6 +26,10 @@ public:
 	UPROPERTY(EditAnywhere, config, Category = "Circular Dependencies Detector")
 		uint32 maxDetectionCount = 100;
 
+	// length of dependency path from which dependencies are ignored
+	UPROPERTY(EditAnywhere, config, Category = "Circular Dependencies Detector")
+		uint32 maxDependencyDepth = 45;
+
 	// delay in seconds before an automatic refresh, put a negative value to disable the automatic refresh
 	UPROPERTY(EditAnywhere, config, Category = "Circular Dependencies Detector")
 		float automaticRefreshDelay = 1.f;
