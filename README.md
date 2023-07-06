@@ -45,7 +45,9 @@ You can freely **get the plugin via the Unreal Engine marketplace** in order to 
 
 ##### 2.2. [Max Detection Count](#22-Max-Detection-Count-1)
 
-##### 2.3. [Automatic Refresh Delay](#23-Automatic-Refresh-Delay-1)
+##### 2.3. [Max Dependency Depth](#23-Max-Dependency-Depth-1)
+
+##### 2.4. [Automatic Refresh Delay](#24-Automatic-Refresh-Delay-1)
 
 #### 3. [Solve circular dependencies](#3-Solve-circular-dependencies-1)
 
@@ -170,7 +172,11 @@ Enable this option to spawn the CDD Editor Widget on startup.
 
 This is the number of circular dependencies detected from which detection is interrupted.
 
-#### 2.3. Automatic Refresh Delay
+#### 2.3. Max Dependency Depth
+
+This is the length of depenency path from which dependencies are ignored.
+
+#### 2.4. Automatic Refresh Delay
 
 This is the delay in seconds before an automatic refresh, put a negative value to disable the automatic refresh.
 
