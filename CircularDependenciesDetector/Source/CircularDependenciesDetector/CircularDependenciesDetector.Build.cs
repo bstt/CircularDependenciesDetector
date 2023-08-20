@@ -46,6 +46,8 @@ public class CircularDependenciesDetector : ModuleRules
 				"UMGEditor",
 				"AIModule",
 				"Projects",
+				"ContentBrowser",
+				"ToolMenus"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

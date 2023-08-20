@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "1.6.2",
+	"VersionName": "1.7.1",
 	"FriendlyName": "Circular Dependencies Detector",
 	"Description": "Plugin for circular dependencies detection.",
 	"Category": "Programming",
@@ -10,7 +10,7 @@
 	"DocsURL": "https://github.com/bstt/CircularDependenciesDetector",
 	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/698a2106995e41cb934ada3bb0088a5f",
 	"SupportURL": "https://github.com/bstt/CircularDependenciesDetector#3-Contact-me-1",
-	"EngineVersion": "5.2.0",
+	"EngineVersion": "5.0.0",
 	"CanContainContent": true,
 	"Installed": true,
 	"Modules": [

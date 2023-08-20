@@ -197,3 +197,8 @@ bool UCircularDependenciesLib::removeExcludedAsset(const FString& excludedAsset)
 	UCDD_ProjectConfig::Get()->SaveConfig();
 	return result;
 }
+
+void UCircularDependenciesLib::BindParseDelegate(const FParseDelegate& toBind)
+{
+	UCircularDependenciesLib::parseDelegate = toBind;
+}

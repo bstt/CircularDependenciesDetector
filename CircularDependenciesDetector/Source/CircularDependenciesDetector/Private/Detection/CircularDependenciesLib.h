@@ -24,6 +24,8 @@ public:
 
 	DECLARE_DYNAMIC_DELEGATE(FVoidDelegate);
 
+	DECLARE_DYNAMIC_DELEGATE_TwoParams(FParseDelegate, const TArray<FAssetData>&, toParseFileList, const TArray<FString>&, toParseFolderList);
+
 	UFUNCTION(BlueprintCallable, Category = "Circular Dependencies Lib", meta = (Keywords = "find editor"))
 		static void SearchInBlueprint(UObject* Asset, bool bAllBlueprints, FString NewSearchTerms);
 
@@ -38,7 +40,7 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Circular Dependencies Lib")
 		static bool IsInGameOrSlateThread();
 
-	// Some actions like spawining object cannot be done in background
+	// Some actions like spawning object cannot be done in background
 	// Careful, bWait need to be enable in order to wait task execution whether in background or not 
 	UFUNCTION(BlueprintCallable, Category = "Circular Dependencies Lib")
 		static void ExecuteTask(const FVoidDelegate& toExecute, bool bInBackground, bool bWait);
@@ -79,4 +81,10 @@ public:
 	// returns true if asset has been removed
 	UFUNCTION(BlueprintCallable, Category = "Circular Dependencies Lib/Project setting")
 		static bool removeExcludedAsset(const FString& excludedAsset);
+
+	// function to execute one time, in order to bind a blueprint callback in c++
+	UFUNCTION(BlueprintCallable, Category = "Circular Dependencies Lib")
+		static void BindParseDelegate(const FParseDelegate& toBind);
+
+	static inline FParseDelegate parseDelegate;
 };

@@ -1,20 +1,20 @@
 // Copyright 2022 bstt, Inc. All Rights Reserved.
 
 #include "CircularDependenciesDetectorModule.h"
-#include "Config/CDD_Settings.h"
 #include "AssetRegistry/AssetRegistryModule.h"
-#include "EditorUtilitySubsystem.h"
-#include "EditorUtilityWidgetBlueprint.h"
-#include "EditorUtilityWidget.h"
-#include "LevelEditor.h"
+#include "Detection/CircularDependenciesLib.h"
+#include "Detection/CDD_MenuExtender.h"
+#include "Config/CDD_Settings.h"
 
 #define LOCTEXT_NAMESPACE "FCircularDependenciesDetectorModule"
 
 void FCircularDependenciesDetectorModule::StartupModule()
 {
 	CDD_Settings::RegisterSettings();
+	CDD_MenuExtender::Get().Init();
+	CDD_MenuExtender::Get().RegisterContextualMenu();
 	if (CDD_Settings::bShowOnStartup())
-		SpawnCDD();
+		registerSpawnCDD();
 }
 
 void FCircularDependenciesDetectorModule::ShutdownModule()
@@ -22,36 +22,15 @@ void FCircularDependenciesDetectorModule::ShutdownModule()
 	CDD_Settings::UnregisterSettings();
 }
 
-void FCircularDependenciesDetectorModule::SpawnCDD()
+void FCircularDependenciesDetectorModule::registerSpawnCDD()
 {
 	FAssetRegistryModule& assetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
-	assetRegistryModule.Get().OnFilesLoaded().AddLambda([]() {
-		if (!IsValid(GEditor)) return;
-		UEditorUtilitySubsystem* EditorUtilitySubsystem = GEditor->GetEditorSubsystem<UEditorUtilitySubsystem>();
-
-		if (!IsValid(EditorUtilitySubsystem)) return;
-		const FSoftObjectPath ewbpPath("/CircularDependenciesDetector/CircularDep/CircularDependencies_EWBP.CircularDependencies_EWBP");
-		UObject* Blueprint = ewbpPath.TryLoad();
-
-		if (!IsValid(Blueprint)) return;
-		UEditorUtilityWidgetBlueprint* EditorWidget = Cast<UEditorUtilityWidgetBlueprint>(Blueprint);
-
-		if (!IsValid(EditorWidget)) return;
-		FLevelEditorModule& LevelEditorModule = FModuleManager::GetModuleChecked<FLevelEditorModule>(TEXT("LevelEditor"));
-
-		auto spawnCddTab = [EditorUtilitySubsystem, EditorWidget]()
-		{
-			UEditorUtilityWidget* UtilityWidget = EditorUtilitySubsystem->FindUtilityWidgetFromBlueprint(EditorWidget);
-			if (UtilityWidget)
-				UtilityWidget->Run();
-			else
-				EditorUtilitySubsystem->SpawnAndRegisterTab(EditorWidget);
-		};
-
-		if (LevelEditorModule.GetLevelEditorTabManager().IsValid())
-			spawnCddTab();
+	assetRegistryModule.Get().OnFilesLoaded().AddLambda([this]() {
+		auto& levelEditorModule = CDD_MenuExtender::Get().GetLevelEditorModule();
+		if (levelEditorModule.GetLevelEditorTabManager().IsValid())
+			CDD_MenuExtender::Get().SpawnCddTab();
 		else
-			LevelEditorModule.OnLevelEditorCreated().AddLambda([spawnCddTab](TSharedPtr<ILevelEditor> levelEditor) { spawnCddTab(); });
+			levelEditorModule.OnLevelEditorCreated().AddLambda([](TSharedPtr<ILevelEditor> levelEditor) { CDD_MenuExtender::Get().SpawnCddTab(); });
 	});
 }
 

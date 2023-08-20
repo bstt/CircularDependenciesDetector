@@ -5,6 +5,9 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
+class UEditorUtilitySubsystem;
+class UEditorUtilityWidgetBlueprint;
+
 class FCircularDependenciesDetectorModule : public IModuleInterface
 {
 public:
@@ -14,5 +17,5 @@ public:
 	virtual void ShutdownModule() override;
 
 private:
-	void SpawnCDD();
+	void registerSpawnCDD();
 };
