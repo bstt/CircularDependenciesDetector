@@ -37,7 +37,9 @@ You can freely **get the plugin via the Unreal Engine marketplace** in order to 
 
 ##### 1.6. [Exclude button](#16-Exclude-button-1)
 
-##### 1.7. [Show plugins](#17-Show-plugins-1)
+##### 1.7. [Contextual menu](#17-Contextual-menu-1)
+
+##### 1.8. [Show plugins](#18-Show-plugins-1)
 
 #### 2. [Configuration](#2-Configuration-1)
 
@@ -97,6 +99,7 @@ Displayed by the plugin :
 - number of excluded assets
 - all excluded assets
 - number of circular dependencies
+- search bar
 - all assets involved in circular dependencies grouped by block.
 
 The current display means this :
@@ -150,11 +153,20 @@ For each excluded asset, you can press the **Include button** in order to includ
 
 [Table of contents](#Table-of-contents)
 
-#### 1.7. Show plugins
+#### 1.7. Contextual menu
+
+In content browser, you can right-click on an asset or a folder and select **Circular Dependencies Detector -> Detect For selected** in order to detect circular dependencies for the selected assets.  
+The search bar is automatically filled with the selected assets.
+
+![Contextual menu](Documentation/Images/1_71-ContextualMenu.png)
+
+[Table of contents](#Table-of-contents)
+
+#### 1.8. Show plugins
 
 By default, the plugin is only searching circular dependencies in the project. You can click on the **Show plugins** button and select the plugins you want to include in the search.
 
-![Show plugins](Documentation/Images/1_71-ShowPlugins.png)
+![Show plugins](Documentation/Images/1_81-ShowPlugins.png)
 
 [Table of contents](#Table-of-contents)
 
